@@ -1,0 +1,33 @@
+# Secrets and credentials
+.env
+*.key
+*.pem
+*.pfx
+*.cer
+credentials*
+secrets*
+
+# Azure authentication/configuration
+.azure/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# PowerShell / temporary files
+*.tmp
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Sensitive exports
+*subscription-id*
+*tenant-id*
+*billing*
+*credentials*
