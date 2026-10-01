@@ -1,0 +1,32 @@
+//
+// Microsoft Enterprise SOC Lab
+// Query: Multi-Event SOC Investigation Timeline
+// Purpose: Correlate important Windows security events into a
+//          chronological investigation timeline.
+// Data Source: SecurityEvent
+//
+// Events:
+//   4624 = Successful Logon
+//   4625 = Failed Logon
+//   4672 = Special Privileges Assigned
+//   4688 = Process Creation
+//   4798 = User Local Group Membership Enumerated
+//   4799 = Local Group Membership Enumerated
+//
+
+SecurityEvent
+| where TimeGenerated > ago(24h)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4624, 4625, 4672, 4688, 4798, 4799)
+| extend EventCategory = case(
+    EventID == 4624, "Successful Logon",
+    EventID == 4625, "Failed Logon",
+    EventID == 4672, "Privileged Logon",
+    EventID == 4688, "Process Creation",
+    EventID == 4798, "User Group Discovery",
+    EventID == 4799, "Local Group Discovery",
+    "Other"
+)
+| project TimeGenerated, EventCategory, EventID, Account, Activity
+| order by TimeGenerated desc
+| take 100

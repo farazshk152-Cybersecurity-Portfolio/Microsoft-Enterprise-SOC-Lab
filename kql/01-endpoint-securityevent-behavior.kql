@@ -1,0 +1,14 @@
+//
+// Microsoft Enterprise SOC Lab
+// Query: Endpoint Security Event Behavior Analysis
+// Purpose: Identify the most frequent Windows Security activities and
+//          associated accounts on the monitored endpoint.
+// Data Source: SecurityEvent
+//
+
+SecurityEvent
+| where TimeGenerated > ago(24h)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| summarize EventCount=count() by EventID, Activity, Account
+| order by EventCount desc
+| take 20

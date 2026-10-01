@@ -1,0 +1,15 @@
+//
+// Microsoft Enterprise SOC Lab
+// Query: Privileged Logon Investigation
+// Purpose: Identify accounts receiving special privileges during logon.
+// Event ID:
+//   4672 = Special privileges assigned to new logon
+// Data Source: SecurityEvent
+//
+
+SecurityEvent
+| where TimeGenerated > ago(24h)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID == 4672
+| summarize PrivilegedLogons=count() by Account
+| order by PrivilegedLogons desc
