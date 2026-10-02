@@ -602,7 +602,7 @@ Most importantly, the hunts avoided treating every unusual event as malicious wi
 | 07 | Microsoft Defender for Cloud | Complete |
 | 08 | Microsoft Entra ID Security | Complete |
 | 09 | Threat Hunting | Complete |
-| 10 | Final Portfolio Integration | In Progress |
+| 10 | Final Portfolio Integration | Complete |
 
 ---
 
