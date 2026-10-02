@@ -1,0 +1,45 @@
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID == 4672
+| summarize
+    PrivilegedLogons=count(),
+    FirstSeen=min(TimeGenerated),
+    LastSeen=max(TimeGenerated)
+    by Account
+| order by PrivilegedLogons desc;
+
+// Focused investigation of non-SYSTEM privileged logons
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID == 4672
+| where Account !~ "NT AUTHORITY\\SYSTEM"
+| project
+    TimeGenerated,
+    Computer,
+    Account,
+    SubjectAccount,
+    SubjectLogonId,
+    Activity
+| order by TimeGenerated asc;
+
+// Correlate selected privileged session with authentication
+SecurityEvent
+| where TimeGenerated between (
+    datetime(2026-09-30 12:05:00) ..
+    datetime(2026-09-30 12:10:00)
+)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4624, 4672)
+| where Account =~ "LAPTOP-JM2CHLK8\\Faraz Shaikh"
+| project
+    TimeGenerated,
+    EventID,
+    Account,
+    LogonType,
+    LogonTypeName,
+    SubjectLogonId,
+    TargetLogonId,
+    IpAddress
+| order by TimeGenerated asc

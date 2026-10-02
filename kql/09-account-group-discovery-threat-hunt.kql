@@ -1,0 +1,50 @@
+//
+// Hunt 02 - Account and Group Discovery
+//
+
+// 1. Establish seven-day discovery baseline
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4798, 4799)
+| extend DiscoveryType = case(
+    EventID == 4798, "User Group Membership Enumeration",
+    EventID == 4799, "Local Group Membership Enumeration",
+    "Other"
+)
+| summarize
+    DiscoveryEvents=count(),
+    FirstSeen=min(TimeGenerated),
+    LastSeen=max(TimeGenerated)
+    by Account, EventID, DiscoveryType
+| order by DiscoveryEvents desc;
+
+// 2. Identify bursty discovery activity
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4798, 4799)
+| summarize DiscoveryEvents=count()
+    by bin(TimeGenerated, 30m), Account, EventID
+| order by TimeGenerated asc;
+
+// 3. Correlate selected high-volume discovery window
+SecurityEvent
+| where TimeGenerated between (
+    datetime(2026-09-30 10:30:00) ..
+    datetime(2026-09-30 11:00:00)
+)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4624, 4625, 4672, 4688, 4798, 4799)
+| extend EventCategory = case(
+    EventID == 4624, "Successful Logon",
+    EventID == 4625, "Failed Logon",
+    EventID == 4672, "Privileged Logon",
+    EventID == 4688, "Process Creation",
+    EventID == 4798, "User Group Discovery",
+    EventID == 4799, "Local Group Discovery",
+    "Other"
+)
+| summarize EventCount=count()
+    by EventCategory, EventID, Account
+| order by EventCount desc

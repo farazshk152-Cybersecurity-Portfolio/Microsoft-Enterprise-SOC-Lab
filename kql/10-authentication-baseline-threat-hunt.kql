@@ -1,0 +1,20 @@
+//
+// Hunt 03 - Authentication Baseline and Anomaly Hunt
+//
+
+// Establish a seven-day Windows authentication baseline
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where Computer =~ "LAPTOP-JM2CHLK8"
+| where EventID in (4624, 4625)
+| extend AuthenticationResult = case(
+    EventID == 4624, "Successful",
+    EventID == 4625, "Failed",
+    "Other"
+)
+| summarize
+    Attempts=count(),
+    FirstSeen=min(TimeGenerated),
+    LastSeen=max(TimeGenerated)
+    by AuthenticationResult, Account, LogonType, LogonTypeName, IpAddress
+| order by Attempts desc
